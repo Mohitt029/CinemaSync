@@ -1,0 +1,4 @@
+
+# Local secrets — never commit
+secrets.env
+src/main/resources/secrets.env

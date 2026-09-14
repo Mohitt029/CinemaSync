@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: auth-service
+
+  # Load local secrets automatically on startup (gitignored)
+  config:
+    import: "optional:file:./secrets.env[.properties],optional:file:./.env[.properties]"
+
+  data:
+    mongodb:
+      uri: mongodb+srv://mohitt1213_db_user:W4iRO09ii1ebamoa@cluster0.ayhbdsp.mongodb.net/cinemasync_auth?retryWrites=true&w=majority&appName=Cluster0
+      database: cinemasync_auth
+      auto-index-creation: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+server:
+  port: 8081
+
+jwt:
+  secret: zSgnyGtPuyJvHHEd7v1z0HOzKsaYoWF5yv9MfiiSepWbkoeZHgBnuPSW0jcryMK7bVcc8bw0E5OfRsP6/GobqQ==
+  expiration: 604800000
+  refresh-expiration: 2592000000
+
+google:
+  client-id: ${GOOGLE_CLIENT_ID:758234567601-cptqe3adu70kigkbdoqnmd5f6n30a7d7.apps.googleusercontent.com}
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  password-reset:
+    token-ttl-minutes: 15
+    from-name: "CinemaSync"
+    from-email: ${MAIL_USERNAME:noreply@cinemasync.app}
+    reply-to: ${MAIL_USERNAME:noreply@cinemasync.app}
+
+logging:
+  level:
+    com.cinemasync: DEBUG
+    org.springframework.security: INFO
+    org.springframework.mail: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

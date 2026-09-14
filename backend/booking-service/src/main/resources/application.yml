@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: booking-service
+  
+  data:
+    mongodb:
+      uri: mongodb+srv://mohitt1213_db_user:W4iRO09ii1ebamoa@cluster0.ayhbdsp.mongodb.net/cinemasync_bookings?retryWrites=true&w=majority&appName=Cluster0
+      database: cinemasync_bookings
+      auto-index-creation: true
+
+server:
+  port: 8084
+  # Allow CORS at the servlet level as fallback
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    com.cinemasync: DEBUG
+    org.springframework.web.cors: DEBUG
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_TaUmuxpm5Cfo0E}
+  key-secret: ${RAZORPAY_KEY_SECRET:fUwpsiGdlZ6OOquL5ckymAbp}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
