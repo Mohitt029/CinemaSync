@@ -12,9 +12,10 @@
       database: cinemasync_auth
       auto-index-creation: true
 
+  spring:
   mail:
     host: smtp.gmail.com
-    port: false
+    port: 587
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
@@ -28,6 +29,14 @@
           timeout: 10000
           writetimeout: 10000
 
+management:
+  health:
+    mail:
+      enabled: false        # ✅ under management.health.mail
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
 server:
   port: ${PORT:8081}
 
