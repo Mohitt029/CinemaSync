@@ -86,7 +86,7 @@ The frontend never talks to a database. It only knows the three service URLs. Ea
 
 ---
 
-## 🔄 The Concurrency Story (Without Diagrams)
+## 🔄 The Concurrency Story 
 
 The hardest part of a ticketing platform isn't the UI or the login — it's making sure **two people never book the same seat**, and that a seat doesn't stay locked forever if someone abandons a payment midway. CinemaSync handles this with a **lock-then-confirm** model, and the story of a single booking goes like this:
 
