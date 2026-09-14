@@ -88,6 +88,89 @@ The frontend never talks to a database. It only knows the three service URLs. Ea
 
 ## 🔄 The Concurrency Story 
 
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as 👤 User
+    participant F as 🌐 Frontend
+    participant B as ⚙️ booking-service
+    participant DB as 🗄️ MongoDB
+    participant R as 💳 Razorpay
+
+    rect rgb(20, 30, 60)
+    Note over U,DB: ACT I — LOCK
+    U->>F: Tap seat C6 → "Lock"
+    F->>B: POST /api/seats/lock { showId, seatIds:[C6] }
+    B->>DB: Check C6 = AVAILABLE?
+    alt C6 available
+        B->>DB: C6 → LOCKED (userId, expiresAt = now+10m)
+        B-->>F: 200 OK [C6 locked]
+        F-->>U: 🟦 Seat turns blue — "Held for 10:00"
+    else C6 already locked/booked
+        B-->>F: 409 Conflict "Seat C6 is currently locked"
+        F-->>U: ❌ Toast: seat unavailable
+    end
+    end
+
+    rect rgb(30, 20, 60)
+    Note over U,DB: ACT II — BOOKING SHELL (seat stays LOCKED)
+    U->>F: Proceed to payment
+    F->>B: POST /api/bookings { showId, seatIds:[C6] }
+    B->>DB: Create Booking { status: PENDING }
+    Note right of DB: ⚠️ Seat NOT flipped to BOOKED yet
+    B-->>F: 201 Created { bookingId }
+    end
+
+    rect rgb(60, 40, 20)
+    Note over U,R: ACT III — RAZORPAY ORDER
+    F->>B: POST /api/payments/create-order { bookingId }
+    B->>R: Create Razorpay order (₹ amount)
+    R-->>B: orderId = order_XXXX
+    B-->>F: { orderId, amount, keyId }
+    F->>U: 🔓 Open Razorpay Checkout modal
+    end
+
+    rect rgb(20, 60, 30)
+    Note over U,DB: ACT IV-A — PAYMENT SUCCESS ✅
+    U->>R: Enter card / UPI
+    R->>R: HMAC-SHA256 sign (orderId|paymentId)
+    R-->>F: { orderId, paymentId, signature }
+    F->>B: POST /api/payments/verify
+    B->>B: Recompute HMAC — compare
+    alt Signature valid
+        B->>DB: Seat C6: LOCKED → BOOKED
+        B->>DB: Booking: PENDING → CONFIRMED
+        B-->>F: 200 OK { booking confirmed }
+        F-->>U: 🎉 Confirmation page
+    else Signature invalid
+        B-->>F: 400 Invalid signature
+        F-->>U: ❌ Payment could not be verified
+    end
+    end
+
+    rect rgb(60, 20, 30)
+    Note over U,DB: ACT IV-B — USER CANCELS ❌
+    U->>R: Close modal / press back
+    R-->>F: ondismiss()
+    F->>B: POST /api/bookings/{id}/cancel
+    B->>DB: Smart-release: LOCKED → AVAILABLE
+    B-->>F: 200 OK
+    F-->>U: 🔄 Seat available again
+    end
+
+    rect rgb(40, 40, 40)
+    Note over U,DB: ACT V — SILENT JANITOR (no user action)
+    loop Every availability read
+        B->>DB: getSeatMatrixWithExpiryCheck()
+        B->>DB: Demote any lock where expiresAt < now
+    end
+    loop Every 30 seconds
+        B->>DB: Full sweep — release all expired locks
+    end
+    Note right of DB: 🧹 Stale locks never stay alive
+    end
+```
+
 The hardest part of a ticketing platform isn't the UI or the login — it's making sure **two people never book the same seat**, and that a seat doesn't stay locked forever if someone abandons a payment midway. CinemaSync handles this with a **lock-then-confirm** model, and the story of a single booking goes like this:
 
 **Act I — The Lock.** A user opens the seat map, taps seat `C6`, and clicks "Lock". The frontend calls `POST /api/seats/lock` on booking-service. In a single synchronized method, the server checks that `C6` is currently `AVAILABLE`, flips it to `LOCKED`, tags it with the user's ID, stamps it with a `expiresAt` timestamp ten minutes in the future, and returns success. If two users click `C6` at the same instant, the Java `synchronized` keyword serializes the calls — the first wins, the second gets a clean "Seat C6 is currently locked" error, and the frontend shows it greyed out.
