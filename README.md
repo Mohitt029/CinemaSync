@@ -41,37 +41,6 @@ What started as a "build a movie ticket app" exercise grew into a real distribut
 
 ---
 
-## 🏗 Architecture
-
-<div align="center">
-┌──────────────────────────────┐
-│ 🌐 Frontend (React) │
-│ localhost:3000 │
-│ MUI · Redux · Framer │
-└──────────────┬───────────────┘
-│
-┌────────────────────────┼────────────────────────┐
-│ │ │
-▼ ▼ ▼
-┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│ auth-service │ │ event-service │ │booking-service│
-│ :8081 │ │ :8082 │ │ :8084 │
-│ │ │ │ │ │
-│ • Register │ │ • Events CRUD │ │ • Seat matrix │
-│ • Login (JWT) │ │ • Search+geo │ │ • Locking/TTL │
-│ • Google OAuth│ │ • AI chatbot │ │ • Razorpay │
-│ • Forgot Pwd │ │ • Showtimes │ │ • Bookings │
-└───────┬───────┘ └───────┬───────┘ └───────┬───────┘
-│ │ │
-▼ ▼ ▼
-┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│ MongoDB │ │ MongoDB │ │ MongoDB │
-│ cinemasync_ │ │ cinemasync_ │ │ cinemasync_ │
-│ _auth │ │ _events │ │ _bookings │
-└───────────────┘ └───────────────┘ └───────────────┘
-
-
-</div>
 
 ### Service responsibilities
 
@@ -82,8 +51,6 @@ What started as a "build a movie ticket app" exercise grew into a real distribut
 | **booking-service** | 8084 | Seats, bookings, payments | `/api/seats/*`, `/api/bookings/*`, `/api/payments/*` |
 
 ---
-
-## ✨ Features
 
 ### 🔐 Authentication
 <table>
@@ -112,3 +79,33 @@ What started as a "build a movie ticket app" exercise grew into a real distribut
 </table>
 
 ### 🎟 Booking engine
+
+### 🎨 Frontend experience
+
+- **Dark premium UI** with glass-morphism auth screens
+- **Live seat counts** across Home / EventsList / EventDetail (polls booking-service every 15s)
+- **Per-user favorites** (scoped localStorage + cross-tab sync)
+- **Protected routes** with post-login redirect
+- **Framer Motion** micro-interactions everywhere
+- **SyncBot** — AI chatbot (Gemini + rule-based fallback)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+| Tool | Version |
+|------|---------|
+| Java | 21+ |
+| Maven | 3.9+ |
+| Node.js | 18+ |
+| MongoDB | Atlas account (free tier) |
+| Razorpay | Test account |
+| Gmail | App password for SMTP |
+
+### 1️⃣ Clone
+
+```bash
+git clone https://github.com/Mohitt029/CinemaSync.git
+cd CinemaSync
