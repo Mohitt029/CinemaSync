@@ -1,4 +1,4 @@
-spring:
+﻿spring:
   application:
     name: auth-service
 
@@ -14,7 +14,7 @@ spring:
 
   mail:
     host: smtp.gmail.com
-    port: 587
+    port: false
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
     properties:
