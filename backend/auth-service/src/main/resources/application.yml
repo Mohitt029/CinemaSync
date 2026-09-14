@@ -29,7 +29,7 @@ spring:
           writetimeout: 10000
 
 server:
-  port: 8081
+  port: ${PORT:8081}
 
 jwt:
   secret: zSgnyGtPuyJvHHEd7v1z0HOzKsaYoWF5yv9MfiiSepWbkoeZHgBnuPSW0jcryMK7bVcc8bw0E5OfRsP6/GobqQ==

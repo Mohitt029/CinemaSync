@@ -9,7 +9,7 @@ spring:
       auto-index-creation: true
 
 server:
-  port: 8084
+  port: ${PORT:8084}
   # Allow CORS at the servlet level as fallback
   servlet:
     context-path: /

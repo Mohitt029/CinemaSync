@@ -1,0 +1,26 @@
+# Build output — rebuilt inside the container
+target/
+*.jar
+*.war
+
+# Local secrets — injected via Render env vars
+secrets.env
+.env
+*.env
+!.env.example
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Version control
+.git/
+.gitignore

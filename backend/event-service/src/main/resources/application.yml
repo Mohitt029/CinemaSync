@@ -1,4 +1,4 @@
-﻿spring:
+spring:
   application:
     name: event-service
   
@@ -9,7 +9,7 @@
       auto-index-creation: true
 
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 booking:
   service:
